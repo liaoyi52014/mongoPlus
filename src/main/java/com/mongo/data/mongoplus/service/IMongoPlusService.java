@@ -34,20 +34,20 @@ public interface IMongoPlusService <T>{
      */
     void addBatch(Collection<T> collection);
 
-/** 功能描述：根据主键id查询
- * @param id 主键id
- * @return java.lang.Object
- * @author liaoyi
- * @date 2022/3/30 15:54
- */
+    /** 功能描述：根据主键id查询
+     * @param id 主键id
+     * @return java.lang.Object
+     * @author liaoyi
+     * @date 2022/3/30 15:54
+     */
     T getById(String id);
 
-/** 功能描述：根据bean对象查询
- * @param t bean对象
- * @return java.util.List<T>
- * @author liaoyi
- * @date 2022/3/30 15:55
- */
+    /** 功能描述：根据bean对象查询
+     * @param t bean对象
+     * @return java.util.List<T>
+     * @author liaoyi
+     * @date 2022/3/30 15:55
+     */
     List<T>  getByCondition(T t);
 
     /** 功能描述：根据id进行修改（非空的参数全替换）
