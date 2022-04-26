@@ -99,6 +99,22 @@ public interface IMongoPlusService <T>{
      */
     List<T> getByQuery(Query query);
 
+    /** 功能描述：根据Criteria 进行查询一个结果
+     * @param criteria 条件
+     * @return T
+     * @author liaoyi@qding.me
+     * @date 2022/4/26 16:54
+     */
+    T getOneByCriteria(Criteria criteria);
+
+    /** 功能描述：根据query 查询一个结果
+     * @param query 查询query条件
+     * @return T
+     * @author liaoyi@qding.me
+     * @date 2022/4/26 16:54
+     */
+    T getOneByQuery(Query query);
+
     /** 功能描述：根据query作为条件来更改update
      * @param query 查询query条件
      * @param update 更新条件
@@ -108,6 +124,25 @@ public interface IMongoPlusService <T>{
      */
     long updateByQuery(Query query, Update update);
 
+    /** 功能描述：根据query 作为条件，根据updateBean不为空的参数 来设置值
+     * @param query 查询query条件
+     * @param updateBean 修改对象
+     * @return long
+     * @author liaoyi@qding.me
+     * @date 2022/4/26 16:51
+     */
+    long updateByQuery(Query query, T updateBean);
+
+
+    /** 功能描述：根据criteria 作为条件，根据updateBean不为空的参数 来设置值
+     * @param criteria 查询条件
+     * @param updateBean 修改对象
+     * @return long
+     * @author liaoyi@qding.me
+     * @date 2022/4/26 16:50
+     */
+    long updateByCriteria(Criteria criteria,T updateBean);
+
     /** 功能描述：根据query进行删除
      * @param query 查询条件
      * @return long 删除数量
@@ -115,6 +150,14 @@ public interface IMongoPlusService <T>{
      * @date 2022/4/25 09:54
      */
     long deleteByQuery(Query query);
+
+    /** 功能描述：根据 criteria 作为条件删除
+     * @param criteria 查询条件
+     * @return long
+     * @author liaoyi@qding.me
+     * @date 2022/4/26 16:52
+     */
+    long deleteByCriteria(Criteria criteria);
 
 
 

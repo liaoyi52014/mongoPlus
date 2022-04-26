@@ -63,7 +63,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     public long updateById(T t) {
         assert t!=null:"查询条件不允许为空";
         try {
-            Field idField = t.getClass().getField("id");
+            Field idField = t.getClass().getDeclaredField("id");
             idField.setAccessible(true);
             Object idObj = idField.get(t);
             assert idObj!=null:"根据id更新，ID不允许为空";
@@ -81,6 +81,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
 
     @Override
     public long updateByCondition(T queryBean, T updateBean) {
+        assert null!=queryBean&&null!=updateBean:"修改参数不允许为空";
         Criteria criteria=new Criteria();
         this.createCriteria(queryBean,criteria,null);
         //创建update
@@ -121,15 +122,48 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     }
 
     @Override
+    public T getOneByCriteria(Criteria criteria) {
+        assert criteria!=null:"查询条件不允许为空";
+        return mongoTemplate.findOne(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+    }
+
+    @Override
+    public T getOneByQuery(Query query) {
+        assert query!=null:"查询条件不允许为空";
+        return mongoTemplate.findOne(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+    }
+
+    @Override
     public long updateByQuery(Query query, Update update) {
-        assert query!=null&&update!=null:"查询条件和更新数据不允许为空";
+        assert query!=null&&update!=null:"修改参数不允许为空";
         return mongoTemplate.updateMulti(query,update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
+    }
+
+    @Override
+    public long updateByQuery(Query query, T updateBean) {
+        assert query!=null&&updateBean!=null:"修改参数不允许为空";
+        Update update = this.mongoCommonUpdate(updateBean, null);
+       return this.updateByQuery(query,update);
+    }
+
+    @Override
+    public long updateByCriteria(Criteria criteria, T updateBean) {
+        assert criteria!=null&&updateBean!=null:"修改参数不允许为空";
+        Query query=new Query(criteria);
+        return this.updateByQuery(query,updateBean);
     }
 
     @Override
     public long deleteByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
         return mongoTemplate.remove(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getDeletedCount();
+    }
+
+    @Override
+    public long deleteByCriteria(Criteria criteria) {
+        assert  null!=criteria:"删除条件不允许为空";
+        Query query=new Query(criteria);
+        return this.deleteByQuery(query);
     }
 
     private Class<T> getMongoBean() {
