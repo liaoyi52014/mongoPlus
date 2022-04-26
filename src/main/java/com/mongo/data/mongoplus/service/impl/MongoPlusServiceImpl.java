@@ -4,10 +4,8 @@ package com.mongo.data.mongoplus.service.impl;
 import com.mongo.data.mongoplus.anntation.MongoBean;
 import com.mongo.data.mongoplus.service.IMongoPlusService;
 import com.mongodb.client.result.DeleteResult;
-import lombok.AllArgsConstructor;
 import org.apache.maven.surefire.shade.org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -171,16 +169,14 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
                 Object o = declaredField.get(t);
                 if (null != o) {
                     if (o instanceof String) {
-                        String value = (String) o;
+                        String value = (String)o;
                         if (StringUtils.isNotBlank(value)) {
                             criteria.and(key).is(value);
                         }
+                    } else if (!(o instanceof Date) && !(o instanceof Map) && !(o instanceof List)) {
+                        this.createCriteria(o, criteria, key);
                     } else {
-                        if (o instanceof Date || o instanceof Map || o instanceof List){
-                            criteria.and(key).is(o);
-                        }else {
-                            createCriteria(o,criteria,key);
-                        }
+                        criteria.and(key).is(o);
                     }
                 }
             } catch (IllegalAccessException e) {
@@ -216,18 +212,15 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             try {
                 Object o = declaredField.get(t);
                 if(null!=o){
-                    if(o instanceof String ){
-                        String value=(String)o;
-                        if(StringUtils.isNotBlank(value)){
-                            update.set(key,value);
+                    if (o instanceof String) {
+                        String value = (String)o;
+                        if (StringUtils.isNotBlank(value)) {
+                            update.set(key, value);
                         }
-                    }else {
-                        if (o instanceof Date || o instanceof Map || o instanceof List){
-                            update.set(key,o);
-                        }else {
-                            mongoCommonUpdate(o,key);
-                        }
-
+                    } else if (!(o instanceof Date) && !(o instanceof Map) && !(o instanceof List)) {
+                        this.mongoCommonUpdate(o, key);
+                    } else {
+                        update.set(key, o);
                     }
                 }
             } catch (IllegalAccessException e) {
