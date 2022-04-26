@@ -50,7 +50,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     public T getById(String id) {
         assert StringUtils.isNotBlank(id):"查询条件不允许为空";
         Criteria criteria = Criteria.where("_id").is(new ObjectId(id));
-        return mongoTemplate.findOne(new Query(criteria), Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null"));
+        return mongoTemplate.findOne(new Query(criteria), Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
         assert t!=null:"查询条件不允许为空";
         Criteria criteria = new Criteria();
         this.createCriteria(t, criteria);
-        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null"));
+        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             idField.set(t,null);
             Update update = this.mongoCommonUpdate(t);
 
-            return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null")).getModifiedCount();
+            return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -87,7 +87,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
         this.createCriteria(queryBean,criteria);
         //创建update
         Update update = this.mongoCommonUpdate(updateBean);
-        return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null")).getModifiedCount();
+        return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
     }
 
     @Override
@@ -113,25 +113,25 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public List<T> getByCriteria(Criteria criteria) {
         assert criteria!=null:"查询条件不允许为空";
-        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null"));
+        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
     }
 
     @Override
     public List<T> getByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
-        return mongoTemplate.find(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null"));
+        return mongoTemplate.find(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
     }
 
     @Override
     public long updateByQuery(Query query, Update update) {
         assert query!=null&&update!=null:"查询条件和更新数据不允许为空";
-        return mongoTemplate.updateMulti(query,update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null")).getModifiedCount();
+        return mongoTemplate.updateMulti(query,update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
     }
 
     @Override
     public long deleteByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
-        return mongoTemplate.remove(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must not be null")).getDeletedCount();
+        return mongoTemplate.remove(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getDeletedCount();
     }
 
     private Class<T> getMongoBean() {
