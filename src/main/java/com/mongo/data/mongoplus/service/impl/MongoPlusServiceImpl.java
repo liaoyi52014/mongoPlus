@@ -7,11 +7,13 @@ import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import org.apache.maven.surefire.shade.org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -24,10 +26,11 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2022/4/2 11:50
  * @since [产品/模块版本]
  **/
-@AllArgsConstructor
+
 public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
 
-    private final MongoTemplate mongoTemplate;
+    @Resource
+    protected MongoTemplate mongoTemplate;
 
     @Override
     public void addOne(T t) {
