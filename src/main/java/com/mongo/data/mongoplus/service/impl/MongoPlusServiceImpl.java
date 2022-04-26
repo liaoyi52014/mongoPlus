@@ -70,7 +70,8 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             Criteria criteria=Criteria.where("_id").is(new ObjectId(idObj.toString()));
             //把id设为空，避免修改id
             idField.set(t,null);
-            Update update = this.mongoCommonUpdate(t,null);
+            Update update=new Update();
+            this.mongoCommonUpdate(update,t,null);
 
             return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -85,7 +86,8 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
         Criteria criteria=new Criteria();
         this.createCriteria(queryBean,criteria,null);
         //创建update
-        Update update = this.mongoCommonUpdate(updateBean,null);
+        Update update=new Update();
+        this.mongoCommonUpdate(update,updateBean,null);
         return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
     }
 
@@ -142,7 +144,8 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public long updateByQuery(Query query, T updateBean) {
         assert query!=null&&updateBean!=null:"修改参数不允许为空";
-        Update update = this.mongoCommonUpdate(updateBean, null);
+        Update update=new Update();
+        this.mongoCommonUpdate(update,updateBean, null);
        return this.updateByQuery(query,update);
     }
 
@@ -222,12 +225,10 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     /** 功能描述：生成公用的update
      * @param t 泛型对象
      * @param parentKey 上级的key
-     * @return org.springframework.data.mongodb.core.query.Update
      * @author liaoyi
      * @date 2022/3/7 9:31 AM
      */
-    protected Update mongoCommonUpdate(Object t,String parentKey){
-        Update update=new Update();
+    protected void mongoCommonUpdate(Update update,Object t,String parentKey){
         Class<?> aClass = t.getClass();
         Field[] declaredFields = aClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
@@ -252,7 +253,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
                             update.set(key, value);
                         }
                     } else if (!(o instanceof Date) && !(o instanceof Map) && !(o instanceof List)) {
-                        this.mongoCommonUpdate(o, key);
+                        this.mongoCommonUpdate(update,o, key);
                     } else {
                         update.set(key, o);
                     }
@@ -261,7 +262,6 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
                 e.printStackTrace();
             }
         }
-        return update;
     }
 
 }
