@@ -57,7 +57,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     public List<T> getByCondition(T t) {
         assert t!=null:"查询条件不允许为空";
         Criteria criteria = new Criteria();
-        this.createCriteria(t, criteria);
+        this.createCriteria(t, criteria,null);
         return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
     }
 
@@ -72,7 +72,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             Criteria criteria=Criteria.where("_id").is(new ObjectId(idObj.toString()));
             //把id设为空，避免修改id
             idField.set(t,null);
-            Update update = this.mongoCommonUpdate(t);
+            Update update = this.mongoCommonUpdate(t,null);
 
             return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -84,9 +84,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public long updateByCondition(T queryBean, T updateBean) {
         Criteria criteria=new Criteria();
-        this.createCriteria(queryBean,criteria);
+        this.createCriteria(queryBean,criteria,null);
         //创建update
-        Update update = this.mongoCommonUpdate(updateBean);
+        Update update = this.mongoCommonUpdate(updateBean,null);
         return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
     }
 
@@ -147,10 +147,11 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
      *
      * @param t        bean 对象
      * @param criteria 查询参数
+     * @param parentKey 上一级的key
      * @author liaoyi
      * @date 2022/4/24 16:23
      */
-    private void createCriteria(Object t, Criteria criteria) {
+    private void createCriteria(Object t, Criteria criteria,String parentKey) {
         Class<?> aClass = t.getClass();
         Field[] declaredFields = aClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
@@ -162,6 +163,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             String key = annotation.value();
             if (StringUtils.isBlank(key)) {
                 continue;
+            }
+            if(StringUtils.isNotBlank(parentKey)){
+                key=parentKey+"."+key;
             }
             try {
                 Object o = declaredField.get(t);
@@ -175,7 +179,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
                         if (o instanceof Date || o instanceof Map || o instanceof List){
                             criteria.and(key).is(o);
                         }else {
-                            createCriteria(o,criteria);
+                            createCriteria(o,criteria,key);
                         }
                     }
                 }
@@ -187,11 +191,12 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
 
     /** 功能描述：生成公用的update
      * @param t 泛型对象
+     * @param parentKey 上级的key
      * @return org.springframework.data.mongodb.core.query.Update
      * @author liaoyi
      * @date 2022/3/7 9:31 AM
      */
-    protected Update mongoCommonUpdate(Object t){
+    protected Update mongoCommonUpdate(Object t,String parentKey){
         Update update=new Update();
         Class<?> aClass = t.getClass();
         Field[] declaredFields = aClass.getDeclaredFields();
@@ -205,6 +210,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             if(StringUtils.isBlank(key)){
                 continue;
             }
+            if(StringUtils.isNotBlank(parentKey)){
+                key=parentKey+"."+key;
+            }
             try {
                 Object o = declaredField.get(t);
                 if(null!=o){
@@ -214,7 +222,12 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
                             update.set(key,value);
                         }
                     }else {
-                        update.set(key,o);
+                        if (o instanceof Date || o instanceof Map || o instanceof List){
+                            update.set(key,o);
+                        }else {
+                            mongoCommonUpdate(o,key);
+                        }
+
                     }
                 }
             } catch (IllegalAccessException e) {
