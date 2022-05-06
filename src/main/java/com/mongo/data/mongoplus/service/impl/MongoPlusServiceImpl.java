@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -230,7 +229,7 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
      * @author liaoyi
      * @date 2022/3/7 9:31 AM
      */
-    protected void mongoCommonUpdate(Update update,Object t,String parentKey){
+    private void mongoCommonUpdate(Update update,Object t,String parentKey){
         Class<?> aClass = t.getClass();
         Field[] declaredFields = aClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
