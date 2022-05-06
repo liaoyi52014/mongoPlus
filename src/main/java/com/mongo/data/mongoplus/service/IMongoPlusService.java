@@ -102,7 +102,7 @@ public interface IMongoPlusService <T>{
     /** 功能描述：根据Criteria 进行查询一个结果
      * @param criteria 条件
      * @return T
-     * @author liaoyi@qding.me
+     * @author liaoyi
      * @date 2022/4/26 16:54
      */
     T getOneByCriteria(Criteria criteria);
@@ -110,7 +110,7 @@ public interface IMongoPlusService <T>{
     /** 功能描述：根据query 查询一个结果
      * @param query 查询query条件
      * @return T
-     * @author liaoyi@qding.me
+     * @author liaoyi
      * @date 2022/4/26 16:54
      */
     T getOneByQuery(Query query);
@@ -128,7 +128,7 @@ public interface IMongoPlusService <T>{
      * @param query 查询query条件
      * @param updateBean 修改对象
      * @return long
-     * @author liaoyi@qding.me
+     * @author liaoyi
      * @date 2022/4/26 16:51
      */
     long updateByQuery(Query query, T updateBean);
@@ -138,7 +138,7 @@ public interface IMongoPlusService <T>{
      * @param criteria 查询条件
      * @param updateBean 修改对象
      * @return long
-     * @author liaoyi@qding.me
+     * @author liaoyi
      * @date 2022/4/26 16:50
      */
     long updateByCriteria(Criteria criteria,T updateBean);
@@ -154,7 +154,7 @@ public interface IMongoPlusService <T>{
     /** 功能描述：根据 criteria 作为条件删除
      * @param criteria 查询条件
      * @return long
-     * @author liaoyi@qding.me
+     * @author liaoyi
      * @date 2022/4/26 16:52
      */
     long deleteByCriteria(Criteria criteria);
