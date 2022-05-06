@@ -49,7 +49,12 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     public T getById(String id) {
         assert StringUtils.isNotBlank(id):"查询条件不允许为空";
         Criteria criteria = Criteria.where("_id").is(new ObjectId(id));
-        return mongoTemplate.findOne(new Query(criteria), Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        Optional.<Class<T>>ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        });
+        return mongoTemplate.findOne(new Query(criteria), Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
@@ -57,7 +62,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
         assert t!=null:"查询条件不允许为空";
         Criteria criteria = new Criteria();
         this.createCriteria(t, criteria,null);
-        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        return mongoTemplate.find(new Query(criteria),Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
@@ -75,7 +82,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
             Update update=new Update();
             this.mongoCommonUpdate(update,t,null);
 
-            return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
+            return mongoTemplate.updateMulti(new Query(criteria),update,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        })).getModifiedCount();
         } catch (NoSuchFieldException | IllegalAccessException e) {
            throw new MongoPlusException("updateById by Id= "+idObj+" error cause by "+ Arrays.toString(e.getStackTrace()));
         }
@@ -89,7 +98,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
         //创建update
         Update update=new Update();
         this.mongoCommonUpdate(update,updateBean,null);
-        return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
+        return mongoTemplate.updateMulti(new Query(criteria),update,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        })).getModifiedCount();
     }
 
     @Override
@@ -115,31 +126,41 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public List<T> getByCriteria(Criteria criteria) {
         assert criteria!=null:"查询条件不允许为空";
-        return mongoTemplate.find(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        return mongoTemplate.find(new Query(criteria),Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
     public List<T> getByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
-        return mongoTemplate.find(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        return mongoTemplate.find(query,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
     public T getOneByCriteria(Criteria criteria) {
         assert criteria!=null:"查询条件不允许为空";
-        return mongoTemplate.findOne(new Query(criteria),Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        return mongoTemplate.findOne(new Query(criteria),Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
     public T getOneByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
-        return mongoTemplate.findOne(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists"));
+        return mongoTemplate.findOne(query,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        }));
     }
 
     @Override
     public long updateByQuery(Query query, Update update) {
         assert query!=null&&update!=null:"修改参数不允许为空";
-        return mongoTemplate.updateMulti(query,update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
+        return mongoTemplate.updateMulti(query,update,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        })).getModifiedCount();
     }
 
     @Override
@@ -160,7 +181,9 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public long deleteByQuery(Query query) {
         assert query!=null:"查询条件不允许为空";
-        return mongoTemplate.remove(query,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getDeletedCount();
+        return mongoTemplate.remove(query,Optional.ofNullable(getMongoBean()).orElseThrow(() -> {
+            throw new MongoPlusException(this.getClass().getName() + " @MongoBean must exists");
+        })).getDeletedCount();
     }
 
     @Override
