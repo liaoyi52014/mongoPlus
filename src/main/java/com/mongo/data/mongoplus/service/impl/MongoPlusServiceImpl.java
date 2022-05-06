@@ -2,6 +2,7 @@ package com.mongo.data.mongoplus.service.impl;
 
 
 import com.mongo.data.mongoplus.anntation.MongoBean;
+import com.mongo.data.mongoplus.exception.MongoPlusException;
 import com.mongo.data.mongoplus.service.IMongoPlusService;
 import com.mongodb.client.result.DeleteResult;
 import org.apache.maven.surefire.shade.org.apache.commons.lang3.StringUtils;
@@ -26,8 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
  **/
 
 public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
-
-    @Resource
+    public MongoPlusServiceImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
     protected MongoTemplate mongoTemplate;
 
     @Override
@@ -62,10 +64,11 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
     @Override
     public long updateById(T t) {
         assert t!=null:"查询条件不允许为空";
+        Object idObj=null;
         try {
             Field idField = t.getClass().getDeclaredField("id");
             idField.setAccessible(true);
-            Object idObj = idField.get(t);
+            idObj = idField.get(t);
             assert idObj!=null:"根据id更新，ID不允许为空";
             Criteria criteria=Criteria.where("_id").is(new ObjectId(idObj.toString()));
             //把id设为空，避免修改id
@@ -75,9 +78,8 @@ public class MongoPlusServiceImpl<T> implements IMongoPlusService<T> {
 
             return mongoTemplate.updateMulti(new Query(criteria),update,Objects.requireNonNull(getMongoBean(),this.getClass().getName()+" @MongoBean must exists")).getModifiedCount();
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+           throw new MongoPlusException("updateById by Id= "+idObj+" error cause by "+ Arrays.toString(e.getStackTrace()));
         }
-        return 0L;
     }
 
     @Override
